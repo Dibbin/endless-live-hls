@@ -63,3 +63,6 @@ typings/
 
 # IDE files
 .idea
+
+#styles compiled
+public/stylesheets/*.css

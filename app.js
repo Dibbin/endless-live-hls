@@ -20,8 +20,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(lessMiddleware(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -29,6 +27,8 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.use(lessMiddleware(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/master.m3u8', masterManifestRouter);

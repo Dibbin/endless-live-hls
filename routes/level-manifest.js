@@ -65,25 +65,58 @@ const rewriteManifest = (req, manifest) => {
 
 
   let count = 0;
-  return manifest.split('\n')
-    .filter(line => {
-      if (count >= targetFragmentCount) {
-        return false;
-      }
-      if (line.indexOf('.ts') !== -1) {
-        count++;
-      }
-      return true;
-    })
-    .map(line => {
-      if(line.indexOf('.ts') !== -1) {
-        //todo handle lines that start with /
-        const fullFragmentUrl = line.indexOf('http') === -1 ? manifestBaseUrl + '/' + line : line;
-        return fullFragmentUrl;
-      }
-      return line;
-    })
-    .join('\n');
+  let totalDuration = 0;
+  let response = [];
+
+  while (totalDuration * 1000 < currentTime) {
+
+    if (count > 0) {
+      response.push('#EXT-X-DISCONTINUITY')
+    }
+
+    let nextFragDuration = 6;
+    response = response.concat(manifest.split('\n')
+      .filter(line => {
+        if (count !== 0) {
+          if ( line.indexOf('#EXT-X') !== -1 ||
+            line.indexOf('#EXTM3U') !== -1) {
+            return false;
+          }
+        }
+        return line &&
+          line.indexOf('#EXT-X-ENDLIST') === -1;
+      })
+      .filter(line => {
+        if (totalDuration * 1000 >= currentTime) {
+          return false;
+        }
+        if (line.indexOf('.ts') !== -1) {
+          count++;
+          totalDuration += nextFragDuration;
+        } else {
+          try {
+            const [ ,duration] = line.match(/#EXTINF:(\d+\.\d+)/);
+            if (duration) {
+              nextFragDuration = Number(duration);
+            }
+          } catch (e) {
+            // don't do anything
+          }
+        }
+        return true;
+      })
+      .map(line => {
+        if(line.indexOf('.ts') !== -1) {
+          //todo handle lines that start with /
+          const fullFragmentUrl = line.indexOf('http') === -1 ? manifestBaseUrl + '/' + line : line;
+          return fullFragmentUrl;
+        }
+        return line;
+      }));
+      // .join('\n');
+  }
+
+  return response.join('\n');
 };
 
 

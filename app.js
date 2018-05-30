@@ -7,6 +7,8 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var masterManifestRouter = require('./routes/master-manifest');
+var levelManifestRouter = require('./routes/level-manifest');
 
 var app = express();
 
@@ -21,8 +23,16 @@ app.use(cookieParser());
 app.use(lessMiddleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/master.m3u8', masterManifestRouter);
+app.use('/level.m3u8', levelManifestRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

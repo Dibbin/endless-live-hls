@@ -58,10 +58,6 @@ const rewriteManifest = (req, manifest) => {
   const manifestBaseUrl = targetManifest.split('/').slice(0,-1).join('/');
 
   const currentTime = new Date().getTime() - Number(initTime);
-  // const [ ,targetDurationStr] = manifest.match(/#EXT-X-TARGETDURATION:(.+)$/);
-  // const targetDuration = Number(targetDurationStr);
-  const targetDuration = 6;
-  const targetFragmentCount = Math.floor(currentTime / (targetDuration * 1000));
 
 
   let count = 0;
@@ -113,7 +109,6 @@ const rewriteManifest = (req, manifest) => {
         }
         return line;
       }));
-      // .join('\n');
   }
 
   return response.join('\n');
@@ -134,10 +129,5 @@ router.get('/', function(req, res, next) {
       });
       res.send(rewriteManifest(req, manifest))
     });
-    // .then(manifest => {
-    //   res.send(`
-    //             <h2>rewritten manifest response:</h2>
-    //             <pre>${rewriteManifest(req, manifest)}</pre>`)
-    // });
 });
 module.exports = router;

@@ -9,19 +9,19 @@ const cache = {};
 const MAX_CACHE_DURATION_MS = 2 * 60 * 60 * 1000; //2 hours
 
 const validateUrl = (req, res) => {
-  // ensure that there is a target manifest in the url
-  if(!req.query.targetManifest){
-    res.statusCode = 400;
-    res.send('targetManifest argument missing in query');
-    return false;
-  }
+  const hostUrl = `http://${req.headers.host}${req.baseUrl.replace('master.m3u8','')}`;
 
   // ensure that we have a start time in the url
   if(!req.query.initTime) {
-    const { startTime } = req.query;
+    let { startTime } = req.query;
+    startTime = Number(startTime);
+    if (isNaN(Number(startTime))) {
+      startTime = 30;
+    }
 
-    const initTime = startTime ? new Date().getTime() - Number(startTime) * 1000 : new Date().getTime();
+    const initTime = new Date().getTime() - Number(startTime) * 1000;
 
+    req.query.initTime = initTime;
     res.redirect(url.format({
       pathname:"/master.m3u8",
       query: Object.assign(req.query, {
@@ -30,6 +30,11 @@ const validateUrl = (req, res) => {
     }));
     return false;
   }
+  // ensure that there is a target manifest in the url
+  if(!req.query.targetManifest){
+    req.query.targetManifest = hostUrl + "example-video/index.m3u8";
+  }
+
   return true;
 };
 
@@ -89,11 +94,5 @@ router.get('/', function(req, res, next) {
     });
     res.send(rewriteManifest(req, manifest))
   });
-  //   .then(manifest => {
-  //     res.send(`<h2>target manifest response:</h2>
-  //               <pre>${manifest}</pre>
-  //               <h2>rewritten manifest response:</h2>
-  //               <pre>${rewriteManifest(req, manifest)}</pre>`)
-  //   });
 });
 module.exports = router;

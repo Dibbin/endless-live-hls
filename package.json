@@ -2,6 +2,7 @@
   "name": "endless-live-video",
   "version": "0.0.0",
   "private": true,
+  "license": "ISC",
   "scripts": {
     "start": "babel-node ./bin/www --presets=env"
   },

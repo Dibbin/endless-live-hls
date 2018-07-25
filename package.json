@@ -6,6 +6,10 @@
   "scripts": {
     "start": "babel-node ./bin/www --presets=env"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dibbin/endless-live-hls.git"
+  },
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
